@@ -1,5 +1,5 @@
 locals {
-  bucket_name = "s3-bucket-for-gcsv5"
+  bucket_name = "s3-bucket-for-gcsv5-${var.environment}"
   region      = var.region
 }
 
@@ -12,7 +12,7 @@ resource "aws_kms_key" "objects" {
 
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
-  bucket = local.bucket_name
+  bucket = "${local.bucket_name}"
 
   force_destroy = var.force_destroy
 

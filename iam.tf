@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "bucket_policy_document" {
 module "iam_policy_bucket_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "bucket_policy"
+  name        = "bucket_policy_${var.environment}"
   path        = "/"
   description = "Bucket policy for GCSv5 s3 connector"
 
@@ -54,14 +54,14 @@ module "iam_policy_bucket_policy" {
 module "iam_user" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
 
-  name = "gcsv5-s3-user"
+  name = "gcsv5-s3-user-${var.environment}"
   create_iam_user_login_profile = false
   create_iam_access_key = true
 }
 
 module "iam_group" {
     source = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
-    name = "gcsv5-s3-group"
+    name = "gcsv5-s3-group-${var.environment}"
     attach_iam_self_management_policy = false
 
     group_users = [
@@ -70,7 +70,7 @@ module "iam_group" {
 
     custom_group_policies = [
         {
-            name = "S3AllowGCSv5Connector"
+            name = "S3AllowGCSv5Connector-${var.environment}"
             policy = module.iam_policy_bucket_policy.policy
         }
     ]

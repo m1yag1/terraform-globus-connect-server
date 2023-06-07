@@ -1,6 +1,6 @@
 module "ec2_gcsv5" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  name = "${var.instance_name}"
+  name = "${var.instance_name}-${var.environment}"
 
   ami                    = var.ami
   instance_type          = var.instance_type
