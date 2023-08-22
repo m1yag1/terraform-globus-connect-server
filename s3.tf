@@ -1,5 +1,5 @@
 locals {
-  bucket_name = "s3-bucket-for-gcsv5-${var.environment}"
+  bucket_name = "${var.bucket_name}-${var.environment}"
   region      = var.region
 }
 
@@ -8,11 +8,13 @@ data "aws_caller_identity" "current" {}
 resource "aws_kms_key" "objects" {
   description             = "KMS key is used to encrypt bucket objects"
   deletion_window_in_days = 7
+
 }
 
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
   bucket = "${local.bucket_name}"
+
 
   force_destroy = var.force_destroy
 
@@ -58,5 +60,4 @@ module "s3_bucket" {
       }
     }
   }
-
 }

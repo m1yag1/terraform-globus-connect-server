@@ -26,3 +26,7 @@ variable environment {
 variable force_destroy {
     default = true
 }
+
+variable bucket_name {
+    type = string
+}

@@ -37,41 +37,46 @@ data "aws_iam_policy_document" "bucket_policy_document" {
   }
 }
 
-module "iam_policy_bucket_policy" {
+module "iam_bucket_policy" {
   source = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "bucket_policy_${var.environment}"
+  name        = "${local.bucket_name}_policy"
   path        = "/"
   description = "Bucket policy for GCSv5 s3 connector"
 
   policy = data.aws_iam_policy_document.bucket_policy_document.json
-
   tags = {
     PolicyDescription = "Bucket policy for GCSv5 s3 connector"
   }
+
 }
 
 module "iam_user" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
 
-  name = "gcsv5-s3-user-${var.environment}"
+  name = "${local.bucket_name}-user"
   create_iam_user_login_profile = false
-  create_iam_access_key = true
+#   create_iam_access_key = true
 }
 
-module "iam_group" {
-    source = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
-    name = "gcsv5-s3-group-${var.environment}"
-    attach_iam_self_management_policy = false
+# module "iam_group" {
+#     source = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
+#     name = "${local.bucket_name}-${var.environment}"
+#     attach_iam_self_management_policy = false
 
-    group_users = [
-        module.iam_user.iam_user_name
-    ]
+#     group_users = [
+#         module.iam_user.iam_user_name
+#     ]
 
-    custom_group_policies = [
-        {
-            name = "S3AllowGCSv5Connector-${var.environment}"
-            policy = module.iam_policy_bucket_policy.policy
-        }
-    ]
+#     custom_group_policies = [
+#         {
+#             name = "S3AllowGCSv5Connector-${var.environment}"
+#             policy = module.iam_bucket_policy.policy
+#         }
+#     ]
+# }
+
+resource "aws_iam_user_policy_attachment" "s3_user_attachment" {
+    user = module.iam_user.iam_user_name
+    policy_arn = module.iam_bucket_policy.arn
 }
